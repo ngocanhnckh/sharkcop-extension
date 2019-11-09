@@ -1,15 +1,11 @@
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.method == "getStatus")
-      sendResponse({status: localStorage['link']});
-    else
-      sendResponse({}); // snub them.
-});
+
 chrome.tabs.onUpdated.addListener(function() {
     onWindowLoad();
     });
     
     setInterval(function() { 
+      alert(1)
         var a = JSON.parse(localStorage.getItem("link"));
         print(a);
         for (let index = 0, len = a.length; index < len; ++index) {
@@ -37,8 +33,9 @@ chrome.tabs.onUpdated.addListener(function() {
     chrome.extension.onMessage.addListener(function(request, sender) {
     if (request.action == "getSource") {
     htmlcontent = request.source;
-    //alert(htmlcontent)
+    // alert(htmlcontent)
     //call whatever function from here on so that htmlcontent will have the selected tab's content.
     }
     
     });
+
