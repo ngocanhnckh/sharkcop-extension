@@ -17,7 +17,7 @@ chrome.tabs.onUpdated.addListener(function() {
      
     function onWindowLoad() {
         chrome.storage.sync.get(['foo', 'bar'], function(items) {
-            alert('Settings retrieved', items);
+            // alert('Settings retrieved', items);
           });
     chrome.tabs.executeScript(null, {
     file: "getPagesSource.js"

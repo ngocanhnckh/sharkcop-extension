@@ -3,7 +3,7 @@
 
 
 chrome.runtime.sendMessage({method: "getStatus"}, function(response) {
-  alert(response.status);
+  alert(linklist.length);
 });
 var s = document.createElement('script');
 s.src = chrome.extension.getURL('script.js');
@@ -12,12 +12,96 @@ s.onload = function() {
   s.parentNode.removeChild(s);
 };
 
-console.error(localStorage)
-$.ajax({
-  url: "https://6c9ff606.ngrok.io/api/check?url=https://fb.com",
-  context: document.body
-}).done(function(data) {
-  alert("RESPONSE:"+data)
+var linklist = [
+  {
+      url:"http://google.com",
+      status:"-1"
+  }
+]
+//localStorage.setItem("link", JSON.stringify(linklist));
+var storedlink = JSON.parse(localStorage.getItem("link"));
+if (storedlink) {
+  linklist = storedlink;
+}
+else {
+  storedlink = linklist;
+}
+localStorage.setItem("link", JSON.stringify(linklist));
+
+
+const target = document.querySelector('div');
+
+//get url from link
+
+// config object
+const config = {
+  characterData: true,
+  characterDataOldValue: true,
+  childList: true,
+  subtree: true
+};
+var limitInterval = 4*1000; // 2 seconds
+var time = Date.now()-limitInterval;
+var lastLoad = -1;
+// subscriber function
+function subscriber(mutations) {
+if (Date.now()-time < limitInterval)
+  return;
+time = Date.now();
+
+mutations.forEach((mutation) => {
+  // console.error(mutation.target.innerText);
+  // console.warn("REGEX",new RegExp("(https?:\/\/[^\s]+)").test(mutation.target.innerText));
+  if(new RegExp("(https?:\/\/[^\s]+)").test(mutation.target.innerText)) {
+      let textt = mutation.target.innerText;
+      let a = textt.match(/\bhttps?:\/\/\S+/gi);
+      //console.log(a);
+      // console.warn(linklist)
+      // console.warn("a",a)
+
+      for (let l = a.length, index = l-1; index >= 0 ; --index) {
+          if (linklist.find(function(elem){
+            return elem.url == a[index]
+          }) === undefined){
+            console.warn("TESTING",a[index])
+            $.ajax({
+              url: `https://6c9ff606.ngrok.io/api/check?url=${a[index]}`,
+              context: document.body
+            }).done(function(data) {
+              // console.warn(`RESPONSE FOR ${a[index]}: ${String(data)}`);
+              if (String(data)=="1"){
+                // console.warn("VUL")
+                $(`a:contains(${a[index]})`).css("background-color", "red");
+              }
+              linklist.push({url:a[index], status:String(data)});
+            });
+          }
+
+      }
+  }
+  // console.error("LEN:",linklist.length);
+  for (let index = linklist.length-1 ; index > 0 ; index--){
+    let elem = linklist[index];
+    // console.warn(elem)
+    if (elem.status == "1")
+      $(`a:contains(${elem.url})`).css("background-color", "red");
+  }
+  lastLoad = linklist.length
+  // $(document).ready(function(){
+  //   $("a:contains(https://trust-lending.net/~trust/WELLS)").css("background-color", "red");
+  // });
+  localStorage.setItem("link", JSON.stringify(linklist));
+  let storedlinkk = JSON.parse(localStorage.getItem("link"));
+  console.log(storedlinkk)
 });
+}
+
+// instantiating observer
+const observer = new MutationObserver(subscriber);
+
+// observing target
+observer.observe(target, config);
+
+
 
 
