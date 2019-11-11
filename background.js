@@ -5,7 +5,7 @@ chrome.tabs.onUpdated.addListener(function() {
     });
     
     setInterval(function() { 
-      alert(1)
+      
         var a = JSON.parse(localStorage.getItem("link"));
         print(a);
         for (let index = 0, len = a.length; index < len; ++index) {
