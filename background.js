@@ -14,27 +14,9 @@ chrome.tabs.onUpdated.addListener(function() {
            }       
         }
     },10000);   
-     
-    function onWindowLoad() {
-        chrome.storage.sync.get(['foo', 'bar'], function(items) {
-            // alert('Settings retrieved', items);
-          });
-    chrome.tabs.executeScript(null, {
-    file: "getPagesSource.js"
-    }, function() {
-    if (chrome.extension.lastError) {
-    htmlcontent = 'There was an error injecting script : \n' +     chrome.extension.lastError.message;
-    }
-    });
-    }
-    
-
-
     chrome.extension.onMessage.addListener(function(request, sender) {
     if (request.action == "getSource") {
     htmlcontent = request.source;
-    // alert(htmlcontent)
-    //call whatever function from here on so that htmlcontent will have the selected tab's content.
     }
     
     });
