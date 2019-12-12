@@ -12,12 +12,15 @@ s.src = chrome.extension.getURL('script.js');
 s.onload = function () {
   s.parentNode.removeChild(s);
 };
-
 var linklist = [
   {
     //init default list
     url: "http://google.com",
     status: "-1"
+  },
+  {
+    url: "http://217.8.117.39/Telus/directing/secure.tangerine.ca/web/login.php",
+    status: "1"
   }
 ]
 //localStorage.setItem("link", JSON.stringify(linklist));
@@ -48,32 +51,36 @@ var lastLoad = -1;
 // subscriber function
 
 setInterval(async function () {
+  
   linklist = JSON.parse(localStorage.getItem("link"));
   for (let index in linklist) {
     item = linklist[index]
-    // console.warn(item);
+    
     if (item.status == "0") {
       linklist[index].status = "2";
       //Place model servr here
       let data = await $.ajax({
-        url: `http://dedicated.youngit.org/api/check?url=${item.url}`,
+        url: `https://aiserver.youngit.org:5000/api/check?url=${item.url}`,
         context: document.body
       })
+      console.warn(item);
 
       
       item.status = String(data);
+      console.log(string(data))
       await localStorage.setItem("link", JSON.stringify(linklist));
 
       if (String(data) == "1") {
-
-
-        $(`a:contains(${item})`).css("background-color", "red");
+        //highlight the danger link
+        $(`a:contains(${item.url})`).css("background-color", "red");
+        $(`a[href*="${item.url}"]`).css("background-color", "red");
       }
     }
     else if (item.status == "1") {
-      $(`a:contains(${item})`).css("background-color", "red");
+      $(`a:contains(${item.url})`).css("background-color", "red");
+      $(`a[href*="${item.url}"]`).css("background-color", "red");
     }
-
+    
   }
 }, 2000)
 
@@ -101,7 +108,10 @@ function subscriber(mutations) {
       let elem = linklist[index];
      
       if (elem.status == "1")
+      {
         $(`a:contains(${elem.url})`).css("background-color", "red");
+        $(`a[href*="${elem.url}"]`).css("background-color", "red");
+      }
     }
     lastLoad = linklist.length
  
