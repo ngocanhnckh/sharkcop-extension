@@ -60,7 +60,7 @@ setInterval(async function () {
       linklist[index].status = "2";
       //Place model servr here
       let data = await $.ajax({
-        url: `https://aiserver.youngit.org:5000/api/check?url=${item.url}`,
+        url: `https://aiserver.youngit.org/api/check?url=${item.url}`,
         context: document.body
       })
       console.warn(item);
